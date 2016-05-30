@@ -1,0 +1,8 @@
+<?php
+
+use Thruster\Tool\SymfonySupervisor\Supervisor;
+
+require_once __DIR__ . '/../vendor/autoload.php';
+
+$supervisor = new Supervisor();
+$supervisor->start(__DIR__ . '/config.php');

@@ -1,0 +1,53 @@
+<?php
+
+use Thruster\Tool\SymfonySupervisor\Configuration;
+use Monolog\Handler\RotatingFileHandler;
+use Monolog\Handler\SwiftMailerHandler;
+use Monolog\Formatter\HtmlFormatter;
+use Monolog\Handler\BufferHandler;
+
+/**
+ * Application Specific Config
+ */
+
+$config = new Configuration(__DIR__ . '/console');
+$config->setBinArguments(['--ansi']);
+
+$emailSubject = 'Project: Console Error Occurred';
+$emailFrom    = 'superivsor@email.com';
+$emailTo      = ['developers@email.com' => 'Developers'];
+
+$rule = new \Thruster\Tool\SymfonySupervisor\Rule('important command', 'debug:config');
+$rule->setRetries(5);
+$rule->setRetryDelay(1);
+
+$config->addRule($rule);
+
+/**
+ * Swift Mailer for sending emails
+ */
+$swiftMailerTransport = Swift_SmtpTransport::newInstance('smtp');
+
+$swiftMailer = Swift_Mailer::newInstance($swiftMailerTransport);
+
+$swiftMessage = Swift_Message::newInstance($emailSubject);
+
+$swiftMessage->setFrom($emailFrom)
+    ->setTo($emailTo)
+    ->setBody('', 'text/html');
+
+/**
+ * Monolog log stuff
+ */
+$mailHandler = new SwiftMailerHandler($swiftMailer, $swiftMessage, \Monolog\Logger::WARNING);
+$mailHandler->setFormatter(new HtmlFormatter());
+
+$bufferHandler = new BufferHandler($mailHandler, 10, \Monolog\Logger::WARNING, true, true);
+
+$rotatingFileHandler = new RotatingFileHandler(__DIR__ . '/logs/supervisor.log', 5, \Monolog\Logger::INFO);
+
+$config->getLogger()->pushHandler($rotatingFileHandler);
+$config->getLogger()->pushHandler($bufferHandler);
+
+
+return $config;
