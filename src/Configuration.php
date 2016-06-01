@@ -32,7 +32,7 @@ class Configuration
      */
     private $rules;
 
-    public function __construct(string $bin)
+    public function __construct($bin)
     {
         $this->rules = [];
         $this->binArguments = [];
