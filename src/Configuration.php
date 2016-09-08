@@ -32,10 +32,13 @@ class Configuration
      */
     private $rules;
 
+    private $successCondes;
+
     public function __construct($bin)
     {
         $this->rules = [];
         $this->binArguments = [];
+        $this->successCondes = [];
 
         $this->bin = $bin;
     }
@@ -129,6 +132,26 @@ class Configuration
     public function addRule(Rule $rule)
     {
         $this->rules[$rule->getName()] = $rule;
+
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getSuccessCondes()
+    {
+        return $this->successCondes;
+    }
+
+    /**
+     * @param array $successCondes
+     *
+     * @return $this
+     */
+    public function setSuccessCondes($successCondes)
+    {
+        $this->successCondes = $successCondes;
 
         return $this;
     }

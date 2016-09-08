@@ -83,7 +83,7 @@ class Supervisor
                     }
                 });
 
-                if ($process->isSuccessful()) {
+                if ($process->isSuccessful() || in_array($process->getExitCode(), $this->configuration->getSuccessCondes())) {
                     $logger->info(
                         'Command exited successfully',
                         ['args' => $command->getString(), 'bin' => $command->getBin()]
