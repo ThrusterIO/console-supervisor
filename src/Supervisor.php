@@ -16,6 +16,8 @@ class Supervisor
 {
     /**
      * @var Configuration
+     *
+     * @return int
      */
     private $configuration;
 
@@ -23,7 +25,7 @@ class Supervisor
     {
         $this->configuration = include_once $configFile;
 
-        $this->startProcess();
+        return $this->startProcess();
     }
 
     /**
@@ -73,7 +75,7 @@ class Supervisor
 
             try {
 
-                $process->run(function ($type, $buffer) use ($stdErr, $stdOut) {
+                $exitCode = $process->run(function ($type, $buffer) use ($stdErr, $stdOut) {
                     if (Process::ERR === $type) {
                         fwrite($stdErr, $buffer);
                         fwrite(STDERR, $buffer);
@@ -91,7 +93,7 @@ class Supervisor
 
                     $logger->info('Finished command', ['args' => $command->getString(), 'bin' => $command->getBin()]);
 
-                    return;
+                    return $exitCode;
                 } else {
                     $logger->error(
                         'Command exited unsuccessfully',
@@ -138,6 +140,8 @@ class Supervisor
                 );
             }
         }
+
+        return $exitCode;
     }
 
     private function getStreamContent($resource)
